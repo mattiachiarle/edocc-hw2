@@ -16,6 +16,10 @@ val scalaParCollVersion = "1.0.4"
 val guavaAdapter2jGraphtVersion = "1.5.2"
 val sparkVersion = "3.4.1"
 
+libraryDependencies += "com.fasterxml.jackson.module" %% "jackson-module-scala" % "2.14.0"
+
+unmanagedBase := baseDirectory.value / "lib"
+
 lazy val commonDependencies = Seq(
   "org.scala-lang.modules" %% "scala-parallel-collections" % scalaParCollVersion,
   "org.scalatest" %% "scalatest" % scalaTestVersion % Test,
@@ -24,36 +28,18 @@ lazy val commonDependencies = Seq(
   "ch.qos.logback" % "logback-classic" % logbackVersion,
   "net.bytebuddy" % "byte-buddy" % netBuddyVersion,
   "org.apache.hadoop" % "hadoop-common" % "3.3.3",
-  "io.circe" %% "circe-core" % "0.14.5",
-  "io.circe" %% "circe-generic" % "0.14.5",
-  "io.circe" %% "circe-parser" % "0.14.5",
+  "io.circe" %% "circe-core" % "0.14.1",
+  "io.circe" %% "circe-generic" % "0.14.1",
+  "io.circe" %% "circe-parser" % "0.14.1",
+  "org.typelevel" %% "cats-core" % "2.9.0",
   "org.typelevel" %% "jawn-parser" % "1.4.0",
   "ch.qos.logback" % "logback-classic" % "1.4.7",
   "org.yaml" % "snakeyaml" % "2.0",
-  "org.apache.spark" %% "spark-core" % sparkVersion,
-  "org.apache.spark" %% "spark-graphx" % sparkVersion
+  "org.apache.spark" %% "spark-core" % sparkVersion exclude("org.scala-lang.modules", "scala-parallel-collections_2.13"),
+  "org.apache.spark" %% "spark-graphx" % sparkVersion exclude("org.scala-lang.modules", "scala-parallel-collections_2.13"),
+  "org.apache.spark" %% "spark-sql" % sparkVersion exclude("org.scala-lang.modules", "scala-parallel-collections_2.13"),
+  "com.fasterxml.jackson.module" %% "jackson-module-scala" % "2.14.2"
 )
-
-lazy val GenericSimUtilities = (project in file("GenericSimUtilities"))
-  .settings(
-    scalaVersion := "2.13.12",
-    name := "GenericSimUtilities",
-    libraryDependencies ++= commonDependencies
-  )
-
-lazy val NetModelGenerator = (project in file("NetModelGenerator"))
-  .settings(
-    scalaVersion := "2.13.12",
-    name := "NetModelGenerator",
-    libraryDependencies ++= commonDependencies ++ Seq(
-      "com.google.guava" % "guava" % guavaVersion,
-      "guru.nidi" % "graphviz-java" % graphVizVersion,
-      "org.typelevel" %% "cats-core" % catsVersion,
-      "commons-io" % "commons-io" % apacheCommonsVersion,
-      "org.jgrapht" % "jgrapht-core" % jGraphTlibVersion,
-      "org.jgrapht" % "jgrapht-guava" % guavaAdapter2jGraphtVersion,
-    )
-  ).dependsOn(GenericSimUtilities)
 
 scalacOptions ++= Seq(
   "-deprecation", // emit warning and location for usages of deprecated APIs
@@ -61,6 +47,13 @@ scalacOptions ++= Seq(
   "-feature", // emit warning and location for usages of features that should be imported explicitly
   "-Ytasty-reader"
 )
+
+compileOrder := CompileOrder.JavaThenScala
+//test / fork := true
+//run / fork := true
+//run / javaOptions ++= Seq(
+//  "-Xms8G",  "-Xmx100G",
+//  "-XX:+UseG1GC")
 
 lazy val root = (project in file("."))
   .settings(

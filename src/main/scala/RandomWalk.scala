@@ -1,6 +1,6 @@
 import Main.getClass
-import NetGraphAlgebraDefs.NodeObject
-import org.apache.spark.graphx.{EdgeDirection, Graph, VertexId, VertexRDD}
+import NetGraphAlgebraDefs.{Action, NodeObject}
+import org.apache.spark.graphx.{EdgeDirection, Graph, VertexId}
 import com.google.common.graph.EndpointPair
 import com.typesafe.config.ConfigFactory
 import org.apache.spark.rdd.RDD
@@ -10,10 +10,9 @@ import scala.collection._
 import scala.collection.mutable.ArrayBuffer
 
 object RandomWalk {
-  def randomWalk(valuable : ArrayBuffer[(NodeObject,Array[NodeObject])], graph : Graph[NodeObject, EndpointPair[NodeObject]], startingNode: RDD[(VertexId,NodeObject)]): NodeObject = {
+  def randomWalk(valuable : Array[(NodeObject,Array[NodeObject])], graph : Graph[NodeObject, Action], startingNode: RDD[(VertexId,NodeObject)]): NodeObject = {
     val logger = LoggerFactory.getLogger(getClass)
     val config = ConfigFactory.load()
-    val rand = new scala.util.Random
     val threshold = config.getDouble("Comparison.threshold")
     var bestComparison : Double = 10
     var bestNode : NodeObject = null
@@ -30,27 +29,31 @@ object RandomWalk {
         }
         logger.info(s"Step in walk. Visited node ${currentNode._1}")
         valuable.foreach(v => {
-          val currentNeighbors = graph.collectNeighbors(EdgeDirection.Either).filter(n => n._1 == currentNode._1).map(n => n._2.map(n2 => n2._2)).collect()(0)
+          val currentNeighbors = graph.collectNeighbors(EdgeDirection.Out).filter(n => n._1 == currentNode._1).map(n => n._2.map(n2 => n2._2)).collect()(0)
+          if(currentNode._2 == null){
+            logger.error("Current node null")
+          }
+          if (currentNeighbors == null) {
+            logger.error("Current neighbors null")
+          }
+          if (v._1 == null) {
+            logger.error("v1 null")
+          }
+          if (v._2 == null) {
+            logger.error("v2 null")
+          }
           val similarity = ComputeSimilarity(currentNode._2, currentNeighbors, v._1, v._2)
           if (similarity < bestComparison) {
+            logger.info(s"New best similarity found: $similarity, with node ${v._1}")
             bestComparison = similarity
-            bestNode = v._1
+            bestNode = currentNode._2
+            if(bestComparison<threshold){
+              logger.info(s"Attacking ${currentNode._1}")
+              return bestNode
+            }
           }
         })
-        val nextNodes = graph.collectNeighbors(EdgeDirection.Out).lookup(currentNode._1).head
-        val nextNewNodes = nextNodes.filter(n => !visitedNodes.contains(n._1))
-        if(nextNewNodes.length==0) {
-          if (nextNodes.length == 0) {
-            logger.info("No successors! Ending iteration before numSteps")
-            currentNode = null
-          }
-          else {
-            currentNode = nextNodes(rand.nextInt(nextNodes.length))
-          }
-        }
-        else{
-          currentNode = nextNewNodes(rand.nextInt(nextNewNodes.length))
-        }
+        currentNode = nextStep(graph,currentNode,visitedNodes)
       }
 
       if (bestComparison < threshold) {
@@ -68,7 +71,29 @@ object RandomWalk {
       }
     }
 
-    return null
+    null
+  }
+
+  def nextStep(graph: Graph[NodeObject, Action], current: (VertexId, NodeObject), visited: ArrayBuffer[Long]): (VertexId, NodeObject) = {
+    val logger = LoggerFactory.getLogger(getClass)
+    val rand = new scala.util.Random
+
+    val nextNodes = graph.collectNeighbors(EdgeDirection.Out).lookup(current._1).head
+    val nextNewNodes = nextNodes.filter(n => !visited.contains(n._1))
+    if (nextNewNodes.length == 0) {
+      if (nextNodes.length == 0) {
+        logger.info("No successors! Ending iteration before numSteps")
+        null
+      }
+      else {
+        logger.info("We visited all the nodes at this step! We'll try a random node")
+        nextNodes(rand.nextInt(nextNodes.length))
+      }
+    }
+    else {
+      logger.info("Visiting a new node!")
+      nextNewNodes(rand.nextInt(nextNewNodes.length))
+    }
   }
 
   /**
@@ -85,7 +110,15 @@ object RandomWalk {
 
     var result = ComputeValue(node1, node2)
 
-    if (result == 0) { //If the nodes are exactly the same, we don't need to check the neighbors and we can directly return
+    //if (result == 0) { //If the nodes are exactly the same, we don't need to check the neighbors and we can directly return
+      return result
+    //}
+
+    if(nodes1 == null){
+      return result
+    }
+
+    if (nodes2 == null) {
       return result
     }
 
