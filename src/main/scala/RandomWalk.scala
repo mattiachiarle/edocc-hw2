@@ -1,7 +1,6 @@
 import Main.getClass
 import NetGraphAlgebraDefs.{Action, NodeObject}
 import org.apache.spark.graphx.{EdgeDirection, Graph, VertexId}
-import com.google.common.graph.EndpointPair
 import com.typesafe.config.ConfigFactory
 import org.apache.spark.rdd.RDD
 import org.slf4j.LoggerFactory

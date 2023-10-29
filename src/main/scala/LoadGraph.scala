@@ -28,7 +28,7 @@ object LoadGraph {
         new FileInputStream(new File(fileName))
       }
       val ois = new ObjectInputStream(fis)
-      val ng = ois.readObject.asInstanceOf[List[NetGraphComponent]]
+      val ng = ois.readObject.asInstanceOf[List[NetGraphAlgebraDefs.NetGraphComponent]]
       ois.close()
       fis.close()
       ng

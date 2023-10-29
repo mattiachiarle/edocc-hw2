@@ -13,7 +13,7 @@ import NetGraphAlgebraDefs._
 import com.typesafe.config.{Config, ConfigFactory}
 
 object FileConverter {
-  def main(args: Array[String]): Unit = {
+  def convert(args: Array[String]): Unit = {
 
     val config = ConfigFactory.load()
     val original = config.getString("Graphs.fileName") //One of the configuration parameters is the name of the file

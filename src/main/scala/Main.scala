@@ -8,7 +8,6 @@ import cats.data._
 import org.apache.spark._
 import org.apache.spark.graphx._
 import org.apache.spark.rdd.RDD
-import com.google.common.graph.EndpointPair
 import org.slf4j.LoggerFactory
 import RandomWalk.randomWalk
 import LoadGraph.loadGraph
@@ -27,11 +26,11 @@ import scala.collection.mutable.ArrayBuffer
 object Main {
   def main(args: Array[String]): Unit = {
 
-    val conf = new SparkConf().setAppName("RandomWalk").setMaster("local[*]")
-    val sc = new SparkContext(conf)
+//    val conf = new SparkConf().setAppName("RandomWalk").setMaster("local[*]")
+//    val sc = new SparkContext(conf)
 
-//    val spark = SparkSession.builder().appName("RandomWalk").getOrCreate()
-//    val sc = spark.sparkContext
+    val spark = SparkSession.builder().appName("RandomWalk").getOrCreate()
+    val sc = spark.sparkContext
 
     val logger = LoggerFactory.getLogger(getClass)
     val config = ConfigFactory.load()

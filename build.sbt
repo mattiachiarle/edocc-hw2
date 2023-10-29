@@ -16,9 +16,8 @@ val scalaParCollVersion = "1.0.4"
 val guavaAdapter2jGraphtVersion = "1.5.2"
 val sparkVersion = "3.4.1"
 
-libraryDependencies += "com.fasterxml.jackson.module" %% "jackson-module-scala" % "2.14.0"
-
-unmanagedBase := baseDirectory.value / "lib"
+dependencyOverrides += "com.fasterxml.jackson.core" % "jackson-databind" % "2.14.2"
+dependencyOverrides += "com.fasterxml.jackson.module" % "jackson-module-scala" % "2.14.2"
 
 lazy val commonDependencies = Seq(
   "org.scala-lang.modules" %% "scala-parallel-collections" % scalaParCollVersion,
@@ -27,7 +26,7 @@ lazy val commonDependencies = Seq(
   "com.typesafe" % "config" % typeSafeConfigVersion,
   "ch.qos.logback" % "logback-classic" % logbackVersion,
   "net.bytebuddy" % "byte-buddy" % netBuddyVersion,
-  "org.apache.hadoop" % "hadoop-common" % "3.3.3",
+//  "org.apache.hadoop" % "hadoop-common" % "3.3.3",
   "io.circe" %% "circe-core" % "0.14.1",
   "io.circe" %% "circe-generic" % "0.14.1",
   "io.circe" %% "circe-parser" % "0.14.1",
@@ -35,9 +34,9 @@ lazy val commonDependencies = Seq(
   "org.typelevel" %% "jawn-parser" % "1.4.0",
   "ch.qos.logback" % "logback-classic" % "1.4.7",
   "org.yaml" % "snakeyaml" % "2.0",
-  "org.apache.spark" %% "spark-core" % sparkVersion exclude("org.scala-lang.modules", "scala-parallel-collections_2.13"),
-  "org.apache.spark" %% "spark-graphx" % sparkVersion exclude("org.scala-lang.modules", "scala-parallel-collections_2.13"),
-  "org.apache.spark" %% "spark-sql" % sparkVersion exclude("org.scala-lang.modules", "scala-parallel-collections_2.13"),
+  "org.apache.spark" %% "spark-core" % sparkVersion,
+  "org.apache.spark" %% "spark-graphx" % sparkVersion,
+  "org.apache.spark" %% "spark-sql" % sparkVersion,
   "com.fasterxml.jackson.module" %% "jackson-module-scala" % "2.14.2"
 )
 
@@ -50,7 +49,7 @@ scalacOptions ++= Seq(
 
 compileOrder := CompileOrder.JavaThenScala
 //test / fork := true
-//run / fork := true
+run / fork := true
 //run / javaOptions ++= Seq(
 //  "-Xms8G",  "-Xmx100G",
 //  "-XX:+UseG1GC")
