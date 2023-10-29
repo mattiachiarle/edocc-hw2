@@ -110,17 +110,18 @@ object RandomWalk {
 
     var result = ComputeValue(node1, node2)
 
-    //if (result == 0) { //If the nodes are exactly the same, we don't need to check the neighbors and we can directly return
-      return result
-    //}
-
-    if(nodes1 == null){
+    if (result == 0) { //If the nodes are exactly the same, we don't need to check the neighbors and we can directly return
       return result
     }
 
-    if (nodes2 == null) {
-      return result
-    }
+//    if(nodes1 == null){
+//      return result
+//    }
+//
+//    if (nodes2 == null) {
+//      return result
+//    }
+    var skipped = 0
 
     nodes1.foreach(n1 => { //For each neighbor of the first node, we compute the lowest similarity with the neighbors of node 2
       var tmp = Double.MaxValue
@@ -130,10 +131,15 @@ object RandomWalk {
           tmp = res
         }
       })
-      result = result + tmp //We add the lowest similarity to the current result
+      if(tmp == Double.MaxValue){
+        skipped += 1
+      }
+      else {
+        result = result + tmp //We add the lowest similarity to the current result
+      }
     })
 
-    result / (nodes1.length) //We normalize the result
+    result / (nodes1.length-skipped).toDouble //We normalize the result
 
   }
 
@@ -149,6 +155,13 @@ object RandomWalk {
     //Properties considered: maxBranchingFactor, maxDepth, maxProperties, propValueRange, storedValue
 
     val config = ConfigFactory.load()
+
+    if(node1==null){
+      return Double.MaxValue
+    }
+    if (node2 == null) {
+      return Double.MaxValue
+    }
 
     val cBranching = config.getDouble("Comparison.cBranching")
     val cDepth = config.getDouble("Comparison.cDepth")
