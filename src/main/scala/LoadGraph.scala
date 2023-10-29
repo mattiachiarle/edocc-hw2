@@ -1,9 +1,8 @@
-import NetGraphAlgebraDefs.{Action, NodeObject}
+import NetGraphAlgebraDefs.NetGraphComponent
 import org.apache.spark.SparkContext
 import org.apache.spark.graphx.Graph
 
 import java.io.FileInputStream
-import NetGraphAlgebraDefs.{Action, NetGraphComponent, NodeObject}
 import org.apache.spark._
 import org.apache.spark.graphx._
 import org.apache.spark.rdd.RDD
@@ -19,7 +18,7 @@ import java.net.URL
 object LoadGraph {
   private val logger = LoggerFactory.getLogger(getClass)
 
-  def loadGraph(fileName: String)(implicit sc: SparkContext): Option[Graph[NodeObject, Action]] = {
+  def loadGraph(fileName: String) = {
     Try {
       val fis = if (fileName.startsWith("http://") || fileName.startsWith("https://")) {
         val url = new URL(fileName)
@@ -28,22 +27,14 @@ object LoadGraph {
         new FileInputStream(new File(fileName))
       }
       val ois = new ObjectInputStream(fis)
-      val ng = ois.readObject.asInstanceOf[List[NetGraphComponent]]
+      val ng = ois.readObject.asInstanceOf[List[NetGraphAlgebraDefs.NetGraphComponent]]
       ois.close()
       fis.close()
       ng
     } match {
       case Success(lstOfNetComponents) =>
-        val vertices: RDD[(VertexId, NodeObject)] = sc.parallelize(lstOfNetComponents.collect {
-          case node: NodeObject => (node.id.toLong, node)
-        })
-
-        val edges: RDD[Edge[Action]] = sc.parallelize(lstOfNetComponents.collect {
-          case action: Action => Edge(action.fromId.toLong, action.toId.toLong, action)
-        })
-
         logger.info("Almost creating graph")
-        Some(Graph(vertices, edges))
+        Some(null)
 
       case Failure(e: FileNotFoundException) =>
         logger.error(s"File not found: $fileName", e)

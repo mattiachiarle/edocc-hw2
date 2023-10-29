@@ -50,7 +50,7 @@ scalacOptions ++= Seq(
 
 compileOrder := CompileOrder.JavaThenScala
 //test / fork := true
-//run / fork := true
+run / fork := true
 //run / javaOptions ++= Seq(
 //  "-Xms8G",  "-Xmx100G",
 //  "-XX:+UseG1GC")

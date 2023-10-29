@@ -9,7 +9,6 @@ import io.circe.syntax._
 import org.apache.hadoop.fs.{FileSystem, Path}
 import org.apache.hadoop.mapred.JobConf
 import org.slf4j.LoggerFactory
-import NetGraphAlgebraDefs._
 import com.typesafe.config.{Config, ConfigFactory}
 
 object FileConverter {
