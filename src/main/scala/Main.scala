@@ -1,4 +1,4 @@
-import NetGraphAlgebraDefs.{NodeObject}
+import NetGraphAlgebraDefs.NodeObject
 import com.typesafe.config.ConfigFactory
 import io.circe._
 import io.circe.generic.auto._
@@ -21,16 +21,16 @@ import org.apache.spark.sql.SparkSession
 import java.io.{BufferedReader, InputStream, InputStreamReader}
 import java.net.URL
 import java.util.stream.Collectors
-import scala.collection.mutable.ArrayBuffer
+import scala.collection.mutable.{ArrayBuffer, ListBuffer}
 
 object Main {
   def main(args: Array[String]): Unit = {
 
-//    val conf = new SparkConf().setAppName("RandomWalk").setMaster("local[*]")
-//    val sc = new SparkContext(conf)
+    val conf = new SparkConf().setAppName("RandomWalk").setMaster("local[*]")
+    val sc = new SparkContext(conf)
 
-    val spark = SparkSession.builder().appName("RandomWalk").getOrCreate()
-    val sc = spark.sparkContext
+//    val spark = SparkSession.builder().appName("RandomWalk").getOrCreate()
+//    val sc = spark.sparkContext
 
     val logger = LoggerFactory.getLogger(getClass)
     val config = ConfigFactory.load()
@@ -77,12 +77,12 @@ object Main {
 //    val originalNodesInputStream: InputStream = originalNodesUrl.openStream()
 //    val originalNodesReader = new BufferedReader(new InputStreamReader(originalNodesInputStream))
 //
-//    val originalNodeslines = mutable.ArrayBuffer[String]()
+//    val originalNodeslines = sc.parallelize(Seq[String])
 //
 //    var line = originalNodesReader.readLine()
 //
 //    while (line != null) {
-//      originalNodeslines += line
+//      originalNodeslines. line
 //      line = originalNodesReader.readLine()
 //    }
 //

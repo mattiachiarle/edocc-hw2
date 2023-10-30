@@ -14,10 +14,10 @@ val apacheCommonsVersion = "2.13.0"
 val jGraphTlibVersion = "1.5.2"
 val scalaParCollVersion = "1.0.4"
 val guavaAdapter2jGraphtVersion = "1.5.2"
-val sparkVersion = "3.4.1"
+val sparkVersion = "3.2.1"
 
-dependencyOverrides += "com.fasterxml.jackson.core" % "jackson-databind" % "2.14.2"
-dependencyOverrides += "com.fasterxml.jackson.module" % "jackson-module-scala" % "2.14.2"
+//dependencyOverrides += "com.fasterxml.jackson.core" % "jackson-databind" % "2.14.2"
+//dependencyOverrides += "com.fasterxml.jackson.module" % "jackson-module-scala" % "2.14.2"
 
 lazy val commonDependencies = Seq(
   "org.scala-lang.modules" %% "scala-parallel-collections" % scalaParCollVersion,
