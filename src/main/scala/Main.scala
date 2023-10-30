@@ -26,75 +26,117 @@ import scala.collection.mutable.{ArrayBuffer, ListBuffer}
 object Main {
   def main(args: Array[String]): Unit = {
 
-    val conf = new SparkConf().setAppName("RandomWalk").setMaster("local[*]")
-    val sc = new SparkContext(conf)
+//    val conf = new SparkConf().setAppName("RandomWalk").setMaster("local[*]")
+//    val sc = new SparkContext(conf)
 
-//    val spark = SparkSession.builder().appName("RandomWalk").getOrCreate()
-//    val sc = spark.sparkContext
+    val spark = SparkSession.builder().appName("RandomWalk").getOrCreate()
+    val sc = spark.sparkContext
 
     val logger = LoggerFactory.getLogger(getClass)
     val config = ConfigFactory.load()
 
-//    val originalEdgesUrl = new URL("https://edocc-homework2.s3.us-east-2.amazonaws.com/graphs/originalEdges")
-//    val originalEdgesInputStream: InputStream = originalEdgesUrl.openStream()
-//    val originalEdgesReader = new BufferedReader(new InputStreamReader(originalEdgesInputStream))
-//
-//    val originalEdges = mutable.ArrayBuffer[Array[Int]]()
-//    val originalEdgeslines = mutable.ArrayBuffer[String]()
-//
-//    var line = originalEdgesReader.readLine()
-//
-//    while(line!=null){
-//      originalEdgeslines += line
-//      line = originalEdgesReader.readLine()
-//    }
-//
-//    originalEdgeslines.foreach(l => {
-//      originalEdges += l.split(" ").map(n => n.toInt)
-//    })
+    val originalEdgesUrl = new URL("https://edocc-homework2.s3.us-east-2.amazonaws.com/graphs/originalEdges")
+    val originalEdgesInputStream: InputStream = originalEdgesUrl.openStream()
+    val originalEdgesReader = new BufferedReader(new InputStreamReader(originalEdgesInputStream))
+
+    val originalEdges = mutable.ArrayBuffer[Array[Int]]()
+    val originalEdgeslines = mutable.ArrayBuffer[String]()
+
+    var line = originalEdgesReader.readLine()
+
+    while(line!=null){
+      originalEdgeslines += line
+      line = originalEdgesReader.readLine()
+    }
+
+    originalEdgeslines.foreach(l => {
+      originalEdges += l.split(" ").map(n => n.toInt)
+    })
 //
 //    originalEdges.foreach(e => println(s"${e(0)} ${e(1)}"))
 //
-//    val perturbedEdgesUrl = new URL("https://edocc-homework2.s3.us-east-2.amazonaws.com/graphs/perturbedEdges")
-//    val perturbedEdgesInputStream: InputStream = perturbedEdgesUrl.openStream()
-//    val perturbedEdgesReader = new BufferedReader(new InputStreamReader(perturbedEdgesInputStream))
+    val perturbedEdgesUrl = new URL("https://edocc-homework2.s3.us-east-2.amazonaws.com/graphs/perturbedEdges")
+    val perturbedEdgesInputStream: InputStream = perturbedEdgesUrl.openStream()
+    val perturbedEdgesReader = new BufferedReader(new InputStreamReader(perturbedEdgesInputStream))
+
+    val perturbedEdges = mutable.ArrayBuffer[Array[Int]]()
+    val perturbedEdgeslines = mutable.ArrayBuffer[String]()
+
+    line = perturbedEdgesReader.readLine()
+
+    while (line != null) {
+      perturbedEdgeslines += line
+      line = perturbedEdgesReader.readLine()
+    }
+
+    perturbedEdgeslines.foreach(l => {
+      perturbedEdges += l.split(" ").map(n => n.toInt)
+    })
 //
-//    val perturbedEdges = mutable.ArrayBuffer[Array[Int]]()
-//    val perturbedEdgeslines = mutable.ArrayBuffer[String]()
+    val originalNodesUrl = new URL("https://edocc-homework2.s3.us-east-2.amazonaws.com/graphs/originalNodes")
+    val originalNodesInputStream: InputStream = originalNodesUrl.openStream()
+    val originalNodesReader = new BufferedReader(new InputStreamReader(originalNodesInputStream))
+
+    val originalNodeslines = mutable.ArrayBuffer[String]()
+
+    line = originalNodesReader.readLine()
+
+    logger.info(line)
+
+    while (line != null) {
+      originalNodeslines += line
+      line = originalNodesReader.readLine()
+    }
+
+    val originalNodes = originalNodeslines.map(n => decode[NetGraphAlgebraDefs.NodeObject](n).toOption).collect { case Some(nodeObject) => nodeObject }.toSeq
+
+    val perturbedNodesUrl = new URL("https://edocc-homework2.s3.us-east-2.amazonaws.com/graphs/perturbedNodes")
+    val perturbedNodesInputStream: InputStream = perturbedNodesUrl.openStream()
+    val perturbedNodesReader = new BufferedReader(new InputStreamReader(perturbedNodesInputStream))
+
+    val perturbedNodeslines = mutable.ArrayBuffer[String]()
+
+    line = perturbedNodesReader.readLine()
+
+    logger.info(line)
+
+    while (line != null) {
+      perturbedNodeslines += line
+      line = perturbedNodesReader.readLine()
+    }
+
+    val perturbedNodes = perturbedNodeslines.map(n => decode[NetGraphAlgebraDefs.NodeObject](n).toOption).collect { case Some(nodeObject) => nodeObject }.toSeq
+
+//    val originalNodesSeq = originalNodes
+//    val originalEdgeSeq: scala.Seq[Int] = originalEdges.toSeq
 //
-//    line = perturbedEdgesReader.readLine()
+//    logger.info(s"Number of vertices - original: ${originalGraph.sm.nodes().size()}")
+
+    val originalNodesRDD: RDD[(VertexId, NodeObject)] = sc.parallelize(originalNodes.map(n => (n.id.toLong, n)))
+    val originalEdgesRDD = sc.parallelize(originalEdges.map(e => Edge[VertexId](e(0), e(1))))
+
+    val oGraph = Graph(originalNodesRDD, originalEdgesRDD)
+    val isEmptyOriginal = oGraph.vertices.isEmpty()
+    if (isEmptyOriginal)
+      logger.error("No vertices")
+
+    val perturbedNodesRDD: RDD[(VertexId, NodeObject)] = sc.parallelize(perturbedNodes.map(n => (n.id.toLong, n)))
+    val perturbedEdgesRDD = sc.parallelize(perturbedEdges.map(e => Edge[VertexId](e(0), e(1))))
+
+    val pGraph = Graph(perturbedNodesRDD, perturbedEdgesRDD)
+    val isEmptyPerturbed = pGraph.vertices.isEmpty()
+    if (isEmptyPerturbed)
+      logger.error("No vertices")
+
+        logger.info("Test completed")
 //
-//    while (line != null) {
-//      perturbedEdgeslines += line
-//      line = perturbedEdgesReader.readLine()
-//    }
-//
-//    perturbedEdgeslines.foreach(l => {
-//      perturbedEdges += l.split(" ").map(n => n.toInt)
-//    })
-//
-//    val originalNodesUrl = new URL("https://edocc-homework2.s3.us-east-2.amazonaws.com/graphs/originalNodes")
-//    val originalNodesInputStream: InputStream = originalNodesUrl.openStream()
-//    val originalNodesReader = new BufferedReader(new InputStreamReader(originalNodesInputStream))
-//
-//    val originalNodeslines = sc.parallelize(Seq[String])
-//
-//    var line = originalNodesReader.readLine()
-//
-//    while (line != null) {
-//      originalNodeslines. line
-//      line = originalNodesReader.readLine()
-//    }
-//
-//    val originalNodes = originalNodeslines.map(n => decode[NodeObject](n).toOption).collect { case Some(nodeObject) => nodeObject }
-//
-//    originalNodes.foreach(n => println(s"${n.id}"))
+//    originalNodes.foreach(n => logger.info(s"${n.id}"))
 
 
-    val originalName = config.getString("Graphs.fileName") //One of the configuration parameters is the name of the file
-    val perturbedName = s"${originalName}.perturbed"
-
-    logger.info(s"Loading the graphs from ${args(0)}$originalName")
+//    val originalName = config.getString("Graphs.fileName") //One of the configuration parameters is the name of the file
+//    val perturbedName = s"${originalName}.perturbed"
+//
+//    logger.info(s"Loading the graphs from ${args(0)}$originalName")
 
 //    val originalNodesFile = sc.textFile(s"${args(0)}/originalNodes")
 //    val perturbedNodesFile = sc.textFile(s"${args(0)}/perturbedNodes")
@@ -117,8 +159,8 @@ object Main {
 //    val originalGraph = load(originalName,args(0))
 //    val perturbedGraph = load(perturbedName,args(0))
 
-    val oGraph = loadGraph(s"${args(0)}$originalName")(sc)
-    val pGraph = loadGraph(s"${args(0)}$perturbedName")(sc)
+//    val oGraph = loadGraph(s"${args(0)}$originalName")(sc)
+//    val pGraph = loadGraph(s"${args(0)}$perturbedName")(sc)
 
 //    Steps:
 //
@@ -132,26 +174,26 @@ object Main {
 //    In the future walks, remove the interesting node attacked and try to avoid the perturbed node attacked. if it's impossible
 //     to avoid it, ignore it in the computations.
 
-    (oGraph, pGraph) match {
-      case (Some(oGraph), Some(pGraph)) =>
-
-//        val originalNodesSeq = originalGraph.sm.nodes().toSeq
-//        val originalEdgeSeq : scala.Seq[EndpointPair[NodeObject]] = originalGraph.sm.edges().toSeq
+//    (oGraph, pGraph) match {
+//      case (Some(oGraph), Some(pGraph)) =>
 //
-//        logger.debug(s"Number of vertices - original: ${originalGraph.sm.nodes().size()}")
+////        val originalNodesSeq = originalGraph.sm.nodes().toSeq
+////        val originalEdgeSeq : scala.Seq[EndpointPair[NodeObject]] = originalGraph.sm.edges().toSeq
+////
+////        logger.debug(s"Number of vertices - original: ${originalGraph.sm.nodes().size()}")
+////
+////        val originalNodes : RDD[(VertexId,NodeObject)] = sc.parallelize(originalNodesSeq.map(n => (n.id,n)))
+////        val originalEdges : RDD[Edge[EndpointPair[NodeObject]]] = sc.parallelize(originalEdgeSeq.map(e => Edge(e.nodeU().id,e.nodeV().id)))
+////
+////        val oGraph = Graph(originalNodes,originalEdges)
 //
-//        val originalNodes : RDD[(VertexId,NodeObject)] = sc.parallelize(originalNodesSeq.map(n => (n.id,n)))
-//        val originalEdges : RDD[Edge[EndpointPair[NodeObject]]] = sc.parallelize(originalEdgeSeq.map(e => Edge(e.nodeU().id,e.nodeV().id)))
-//
-//        val oGraph = Graph(originalNodes,originalEdges)
-
         logger.info("Created the RDD of the original graph")
-
-        val isEmpty = oGraph.vertices.isEmpty()
-        if(isEmpty) {
-          logger.error("No vertices")
-        }
-
+//
+//        val isEmpty = oGraph.vertices.isEmpty()
+//        if(isEmpty) {
+//          logger.error("No vertices")
+//        }
+//
         val valuableNodes = oGraph.vertices.filter(n => n._2.valuableData).map(n => n._2).collect()
         val valuableIds = valuableNodes.map(n => n.id)
 
@@ -229,7 +271,7 @@ object Main {
         logger.info(s"Discovery rate = ${discover.toDouble/attempts.toDouble}")
         logger.info(s"Failure rate = ${fail.toDouble/attempts.toDouble}")
         logger.info(s"No attack rate = ${(attempts-(success+discover+fail)).toDouble/attempts.toDouble}")
-    }
+//    }
 
     sc.stop()
 

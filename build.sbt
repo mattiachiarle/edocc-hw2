@@ -1,6 +1,6 @@
 ThisBuild / version := "0.1.0-SNAPSHOT"
 
-ThisBuild / scalaVersion := "2.13.12"
+ThisBuild / scalaVersion := "2.12.18"
 
 val scalaTestVersion = "3.2.11"
 val guavaVersion = "31.1-jre"
@@ -14,45 +14,50 @@ val apacheCommonsVersion = "2.13.0"
 val jGraphTlibVersion = "1.5.2"
 val scalaParCollVersion = "1.0.4"
 val guavaAdapter2jGraphtVersion = "1.5.2"
-val sparkVersion = "3.2.1"
+val sparkVersion = "3.4.1"
 
-//dependencyOverrides += "com.fasterxml.jackson.core" % "jackson-databind" % "2.14.2"
-//dependencyOverrides += "com.fasterxml.jackson.module" % "jackson-module-scala" % "2.14.2"
+//libraryDependencies += "com.fasterxml.jackson.module" %% "jackson-module-scala" % "2.14.0"
+
+//unmanagedBase := baseDirectory.value / "lib"
 
 lazy val commonDependencies = Seq(
-  "org.scala-lang.modules" %% "scala-parallel-collections" % scalaParCollVersion,
+  //  "org.scala-lang.modules" %% "scala-parallel-collections" % scalaParCollVersion,
   "org.scalatest" %% "scalatest" % scalaTestVersion % Test,
   "org.scalatestplus" %% "mockito-4-2" % "3.2.12.0-RC2" % Test,
   "com.typesafe" % "config" % typeSafeConfigVersion,
   "ch.qos.logback" % "logback-classic" % logbackVersion,
-  "net.bytebuddy" % "byte-buddy" % netBuddyVersion,
-//  "org.apache.hadoop" % "hadoop-common" % "3.3.3",
+  //  "net.bytebuddy" % "byte-buddy" % netBuddyVersion,
+  //  "org.apache.hadoop" % "hadoop-common" % "3.3.3",
   "io.circe" %% "circe-core" % "0.14.1",
   "io.circe" %% "circe-generic" % "0.14.1",
   "io.circe" %% "circe-parser" % "0.14.1",
-  "org.typelevel" %% "cats-core" % "2.9.0",
-  "org.typelevel" %% "jawn-parser" % "1.4.0",
+  //  "org.typelevel" %% "cats-core" % "2.9.0",
+  //  "org.typelevel" %% "jawn-parser" % "1.4.0",
   "ch.qos.logback" % "logback-classic" % "1.4.7",
-  "org.yaml" % "snakeyaml" % "2.0",
+  //  "org.yaml" % "snakeyaml" % "2.0",
   "org.apache.spark" %% "spark-core" % sparkVersion,
   "org.apache.spark" %% "spark-graphx" % sparkVersion,
   "org.apache.spark" %% "spark-sql" % sparkVersion,
-  "com.fasterxml.jackson.module" %% "jackson-module-scala" % "2.14.2"
+  //  "com.fasterxml.jackson.module" %% "jackson-module-scala" % "2.14.2"
+)
+
+assembly / assemblyShadeRules := Seq(
+  ShadeRule.rename("org.typelevel.cats.**" -> "repackaged.org.typelevel.cats.@1").inAll,
+  ShadeRule.rename("cats.**" -> "repackaged.cats.@1").inAll,
 )
 
 scalacOptions ++= Seq(
   "-deprecation", // emit warning and location for usages of deprecated APIs
-  "--explain-types", // explain type errors in more detail
+  //  "--explain-types", // explain type errors in more detail
   "-feature", // emit warning and location for usages of features that should be imported explicitly
-  "-Ytasty-reader"
 )
 
 compileOrder := CompileOrder.JavaThenScala
-//test / fork := true
+test / fork := true
 run / fork := true
-//run / javaOptions ++= Seq(
-//  "-Xms8G",  "-Xmx100G",
-//  "-XX:+UseG1GC")
+run / javaOptions ++= Seq(
+  "-Xms8G",  "-Xmx100G",
+  "-XX:+UseG1GC")
 
 lazy val root = (project in file("."))
   .settings(

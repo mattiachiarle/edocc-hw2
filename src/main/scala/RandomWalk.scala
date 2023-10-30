@@ -9,7 +9,7 @@ import scala.collection._
 import scala.collection.mutable.ArrayBuffer
 
 object RandomWalk {
-  def randomWalk(valuable : Array[(NodeObject,Array[NodeObject])], graph : Graph[NodeObject, Action], startingNode: RDD[(VertexId,NodeObject)]): NodeObject = {
+  def randomWalk(valuable : Array[(NodeObject,Array[NodeObject])], graph : Graph[NodeObject, VertexId], startingNode: RDD[(VertexId,NodeObject)]): NodeObject = {
     val logger = LoggerFactory.getLogger(getClass)
     val config = ConfigFactory.load()
     val threshold = config.getDouble("Comparison.threshold")
@@ -73,7 +73,7 @@ object RandomWalk {
     null
   }
 
-  def nextStep(graph: Graph[NodeObject, Action], current: (VertexId, NodeObject), visited: ArrayBuffer[Long]): (VertexId, NodeObject) = {
+  def nextStep(graph: Graph[NodeObject, VertexId], current: (VertexId, NodeObject), visited: ArrayBuffer[Long]): (VertexId, NodeObject) = {
     val logger = LoggerFactory.getLogger(getClass)
     val rand = new scala.util.Random
 
