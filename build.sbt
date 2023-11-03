@@ -16,29 +16,19 @@ val scalaParCollVersion = "1.0.4"
 val guavaAdapter2jGraphtVersion = "1.5.2"
 val sparkVersion = "3.4.1"
 
-//libraryDependencies += "com.fasterxml.jackson.module" %% "jackson-module-scala" % "2.14.0"
-
-//unmanagedBase := baseDirectory.value / "lib"
-
 lazy val commonDependencies = Seq(
-  //  "org.scala-lang.modules" %% "scala-parallel-collections" % scalaParCollVersion,
   "org.scalatest" %% "scalatest" % scalaTestVersion % Test,
   "org.scalatestplus" %% "mockito-4-2" % "3.2.12.0-RC2" % Test,
+  "org.scalamock" %% "scalamock" % "5.2.0" % Test,
   "com.typesafe" % "config" % typeSafeConfigVersion,
   "ch.qos.logback" % "logback-classic" % logbackVersion,
-  //  "net.bytebuddy" % "byte-buddy" % netBuddyVersion,
-  //  "org.apache.hadoop" % "hadoop-common" % "3.3.3",
   "io.circe" %% "circe-core" % "0.14.1",
   "io.circe" %% "circe-generic" % "0.14.1",
   "io.circe" %% "circe-parser" % "0.14.1",
-  //  "org.typelevel" %% "cats-core" % "2.9.0",
-  //  "org.typelevel" %% "jawn-parser" % "1.4.0",
   "ch.qos.logback" % "logback-classic" % "1.4.7",
-  //  "org.yaml" % "snakeyaml" % "2.0",
   "org.apache.spark" %% "spark-core" % sparkVersion,
   "org.apache.spark" %% "spark-graphx" % sparkVersion,
   "org.apache.spark" %% "spark-sql" % sparkVersion,
-  //  "com.fasterxml.jackson.module" %% "jackson-module-scala" % "2.14.2"
 )
 
 assembly / assemblyShadeRules := Seq(
@@ -48,7 +38,6 @@ assembly / assemblyShadeRules := Seq(
 
 scalacOptions ++= Seq(
   "-deprecation", // emit warning and location for usages of deprecated APIs
-  //  "--explain-types", // explain type errors in more detail
   "-feature", // emit warning and location for usages of features that should be imported explicitly
 )
 
