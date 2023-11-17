@@ -1,0 +1,6 @@
+Student: Mattia Chiarle
+
+Your code is clean and your documentation is good. I noticed that you worked upon the feedback for the last homework and implemented logging in your program. Kudos!
+Keep it up!
+
+Final Grade: 15%
