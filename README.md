@@ -1,4 +1,4 @@
-# Homework 1
+# Homework 2
 Author: Mattia Chiarle, mchiar2@uic.edu
 
 ## How to execute my program
